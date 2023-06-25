@@ -1,0 +1,17 @@
+{
+  "App": {
+    "server": {
+      "port": 3000,
+      "baseUrl": "http://localhost",
+      "logger": {
+        "enabled": true,
+        "level": "info"
+      }
+    },
+    "database": {
+      "url": "",
+      "user": "",
+      "password": ""
+    }
+  }
+}
