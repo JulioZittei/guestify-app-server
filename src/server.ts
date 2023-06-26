@@ -1,9 +1,12 @@
 import './util/module-alias'
 import fastify, { FastifyInstance } from 'fastify'
 import { bootstrap } from 'fastify-decorators'
-import cors from '@fastify/cors'
-import { UserController } from './controllers/user.controller'
 import logger from './logger'
+import cors from '@fastify/cors'
+import jwt from '@fastify/jwt'
+import config from 'config'
+import { AuthController } from './controllers/auth-controller'
+import { UserController } from './controllers/user-controller'
 
 class SetupServer {
   private server: FastifyInstance
@@ -41,6 +44,9 @@ class SetupServer {
   private setupFastify(): void {
     logger.info('🔌 Setting up plugins')
     this.server.register(cors, { origin: '*' })
+    this.server.register(jwt, {
+      secret: config.get('App.auth.secretKey'),
+    })
     this.server.decorate('logger', logger)
   }
 
@@ -48,7 +54,7 @@ class SetupServer {
     logger.info('🎮 Setting up controllers')
 
     this.server.register(bootstrap, {
-      controllers: [UserController],
+      controllers: [UserController, AuthController],
     })
   }
 
