@@ -25,19 +25,13 @@ class SetupServer {
     this.setupErrorHandlers()
   }
 
-  public start(): void {
+  public async start(): Promise<string> {
     logger.info('🕐 Starting up server')
-    this.server
-      .listen({
-        port: this.port,
-      })
-      .then(() => {
-        logger.info(`🚀 HTTP server running on ${this.baseUrl}:${this.port}`)
-      })
-  }
-
-  public getApp(): FastifyInstance {
-    return this.server
+    const httpServer = await this.server.listen({
+      port: this.port,
+    })
+    logger.info(`🚀 HTTP server running on ${this.baseUrl}:${this.port}`)
+    return httpServer
   }
 
   public async close(): Promise<void> {

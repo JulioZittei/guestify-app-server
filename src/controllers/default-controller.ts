@@ -8,8 +8,6 @@ type Response = FastifyReply
 interface HttpError extends Error {
   status?: number
   code: number
-  description: string
-  documentation: string
 }
 
 abstract class AbstractDefaultController {
@@ -24,8 +22,6 @@ abstract class AbstractDefaultController {
       code: statusCode,
       error: HttpStatus.getStatusText(statusCode),
       message: statusCode != 500 ? error.message : new ServerError().message,
-      ...(error.description && { description: error.description }),
-      ...(error.documentation && { documentation: error.documentation }),
     })
   }
 }

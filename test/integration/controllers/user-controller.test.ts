@@ -1,6 +1,5 @@
 import { UserRepositoryPrisma } from '@src/adapters/repositories/user-repository'
 import { ServerError } from '@src/controllers/errors/server-error'
-import { UnauthorizedError } from '@src/services/errors/unauthorized-error'
 import HttpStatus from 'http-status-codes'
 import clientPrisma from '@src/adapters/repositories/client'
 import { UserAlreadyExistsError } from '@src/services/errors/user-already-exists-error'
