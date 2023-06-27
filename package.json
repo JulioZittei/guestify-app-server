@@ -9,16 +9,16 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/src/index.js",
-    "start:dev": "dotenv -e .env -- ts-node-dev --transpile-only 'src/index.ts' | pino-pretty -C",
-    "test": "dotenv -e .env -- jest --runInBand --passWithNoTests",
-    "test:unit": "dotenv -e .env -- jest ./test/unit --passWithNoTests",
-    "test:integration": "dotenv -e .env -- jest ./test/integration --runInBand --passWithNoTests",
+    "start:dev": "dotenv -e .env -- ts-node-dev --transpile-only src/index.ts | pino-pretty -C",
+    "test": "dotenv -e .env -- jest --projects ./test/unit ./test/integration --runInBand --passWithNoTests",
+    "test:unit": "dotenv -e .env -- jest --projects ./test/unit --passWithNoTests",
+    "test:integration": "dotenv -e .env -- jest --projects ./test/integration --runInBand --passWithNoTests",
     "test:staged": "npm test",
-    "test:push": "dotenv -e .env -- jest --runInBand --passWithNoTests --coverage",
+    "test:push": "dotenv -e .env -- jest --projects ./test/unit ./test/integration --runInBand --passWithNoTests --coverage",
     "lint": "eslint ./src ./test --ext .ts",
-    "style": "prettier --check 'src/**/*.ts' 'test/**/*.ts'",
+    "style": "prettier --check src/**/*.ts test/**/*.ts",
     "lint:fix": "eslint ./src ./test --ext .ts --fix",
-    "style:fix": "prettier --write 'src/**/*.ts' 'test/**/*.ts'",
+    "style:fix": "prettier --write src/**/*.ts test/**/*.ts",
     "husky:prepare": "husky install"
   },
   "_moduleAliases": {
