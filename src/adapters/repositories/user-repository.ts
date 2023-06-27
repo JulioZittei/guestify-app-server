@@ -16,11 +16,16 @@ class UserRepositoryPrisma implements IUserRepository {
     })
   }
 
-  public async exists(filter: FilterOptions): Promise<User | null | undefined> {
+  public async exists(filter: FilterOptions): Promise<boolean> {
     logger.info(`Finding user`)
-    return await this.database.user.findUnique({
+    const user = await this.database.user.findUnique({
       where: filter,
+      select: {
+        id: true,
+      },
     })
+
+    return user ? true : false
   }
 
   public async findOne(
