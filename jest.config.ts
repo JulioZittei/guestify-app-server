@@ -2,11 +2,16 @@ import { resolve } from 'path'
 
 module.exports = {
   rootDir: resolve(__dirname),
-  displayName: 'application-tests',
-  testMatch: ['<rootDir>/test/**/*.test.ts'],
+  displayName: 'All-tests',
+  testMatch: [
+    '<rootDir>/test/unit/**/*.test.ts',
+    '<rootDir>/test/integration/**/*.test.ts',
+  ],
   testEnvironment: 'node',
+  collectCoverage: true,
   collectCoverageFrom: ['<rootDir>/src/**/*.ts'],
-  coverageDirectory: 'coverage',
+  coveragePathIgnorePatterns: ['/src/@types/*', '/src/config/*'],
+  coverageDirectory: '<rootDir>/coverage',
   clearMocks: true,
   transform: {
     '^.+\\.(ts|tsx)$': [

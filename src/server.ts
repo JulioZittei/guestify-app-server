@@ -1,4 +1,4 @@
-import './util/module-alias'
+import './config/module-alias'
 import fastify, { FastifyInstance } from 'fastify'
 import { bootstrap } from 'fastify-decorators'
 import logger from './logger'
@@ -34,6 +34,10 @@ class SetupServer {
       .then(() => {
         logger.info(`🚀 HTTP server running on ${this.baseUrl}:${this.port}`)
       })
+  }
+
+  public getApp(): FastifyInstance {
+    return this.server
   }
 
   public async close(): Promise<void> {
