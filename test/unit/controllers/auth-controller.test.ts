@@ -1,7 +1,7 @@
-import { UserRepositoryPrisma } from '@src/adapters/repositories/user-repository-prisma'
+import { AccountRepositoryPrisma } from '@src/adapters/repositories/account-repository-prisma'
 import { AuthServiceImpl } from '@src/services/auth-service-impl'
 import { Request, Response } from '@src/controllers/default-controller'
-import { TokenResponse } from '@src/services/responses/auth-user-response'
+import { TokenResponse } from '@src/services/responses/auth-response'
 import { error, result } from '@src/shared/either'
 import { AuthController } from '@src/controllers/auth-controller'
 import { IncomingMessage } from 'http'
@@ -10,10 +10,10 @@ import HttpStatus from 'http-status-codes'
 import { ServerError } from '@src/controllers/errors/server-error'
 
 jest.mock('@src/services/auth-service-impl')
-jest.mock('@src/adapters/repositories/user-repository-prisma')
+jest.mock('@src/adapters/repositories/account-repository-prisma')
 
 describe('Auth Controller', () => {
-  const userData = {
+  const accountData = {
     email: 'john@mail.com',
     password: '12345',
   }
@@ -30,7 +30,7 @@ describe('Auth Controller', () => {
   const req: Partial<Request> = {
     raw: raw as IncomingMessage,
     body: {
-      ...userData,
+      ...accountData,
     },
   }
 
@@ -39,15 +39,15 @@ describe('Auth Controller', () => {
     send: jest.fn().mockReturnThis(),
   }
 
-  const mockedUserRepository =
-    new UserRepositoryPrisma() as jest.Mocked<UserRepositoryPrisma>
+  const mockedAccountRepository =
+    new AccountRepositoryPrisma() as jest.Mocked<AccountRepositoryPrisma>
 
   const mockedAuthService = new AuthServiceImpl(
-    mockedUserRepository,
+    mockedAccountRepository,
   ) as jest.Mocked<AuthServiceImpl>
 
-  describe('When authenticating an user', () => {
-    it('should authenticate an user with success', async () => {
+  describe('When authenticating an account', () => {
+    it('should authenticate an account with success', async () => {
       mockedAuthService.execute.mockResolvedValueOnce(result(generatedToken))
 
       const inTest = new AuthController(mockedAuthService)
@@ -62,7 +62,7 @@ describe('Auth Controller', () => {
       expect(response.send).toHaveBeenCalledWith(generatedToken)
     })
 
-    it('should response with client error 401 when user does not exists or password does not match', async () => {
+    it('should response with client error 401 when account does not exists or password does not match', async () => {
       mockedAuthService.execute.mockResolvedValueOnce(
         error(new UnauthorizedError()),
       )

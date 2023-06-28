@@ -1,77 +1,88 @@
-import { UserRepositoryPrisma } from '@src/adapters/repositories/user-repository-prisma'
+import { AccountRepositoryPrisma } from '@src/adapters/repositories/account-repository-prisma'
 import { ServerError } from '@src/controllers/errors/server-error'
 import HttpStatus from 'http-status-codes'
 import clientPrisma from '@src/adapters/repositories/client'
-import { UserAlreadyExistsError } from '@src/services/errors/user-already-exists-error'
-import { UserNotFoundError } from '@src/services/errors/user-not-found-error'
+import { AccountAlreadyExistsError } from '@src/services/errors/account-already-exists-error'
+import { AccountNotFoundError } from '@src/services/errors/account-not-found-error'
 import { AuthServiceImpl } from '@src/services/auth-service-impl'
+import { AccountStatus } from '@src/models/account'
 
-describe('User Controller Integration', () => {
-  const userRepository = new UserRepositoryPrisma()
+describe('Account Controller Integration', () => {
+  const accountRepository = new AccountRepositoryPrisma()
 
-  const url = '/api/v1/users'
+  const url = '/api/v1/accounts'
 
-  const userDefault = {
+  const accountDefault = {
     name: 'John',
     email: 'john@mail.com',
     phone: '(11) 99999-9999',
     password: '12345',
   }
 
-  const responseUser = {
-    name: userDefault.name,
-    email: userDefault.email,
-    phone: userDefault.phone,
+  const responseAccount = {
+    name: accountDefault.name,
+    email: accountDefault.email,
+    phone: accountDefault.phone,
   }
 
   beforeEach(async () => {
-    await userRepository.deleteAll()
+    await accountRepository.deleteAll()
   })
 
-  describe('When registering an user', () => {
-    it('should register an user with success', async () => {
-      const response = await global.testRequest.post(`${url}`).send(userDefault)
+  describe('When registering an account', () => {
+    it('should register an account with success', async () => {
+      const response = await global.testRequest
+        .post(`${url}/register`)
+        .send(accountDefault)
 
-      const expectedStatusCode = 201
+      const expectedStatusCode = 202
 
       expect(response).not.toBeNull()
       expect(response.statusCode).toBe(expectedStatusCode)
       expect(response.body).toMatchObject({
-        id: expect.any(String),
-        ...responseUser,
+        status: AccountStatus.AWAITING_VALIDATION,
+        message: `A verification code was sent to the email '${responseAccount.email}'. Please validate the code to confirm your registration.`,
+        url: expect.any(String),
       })
     })
 
-    it('should response with client error 409 when user already exists', async () => {
-      await userRepository.create(userDefault)
+    it('should response with client error 409 when account already exists', async () => {
+      await accountRepository.create({
+        ...accountDefault,
+        status: AccountStatus.AWAITING_VALIDATION,
+      })
 
-      const response = await global.testRequest.post(`${url}`).send(userDefault)
+      const response = await global.testRequest
+        .post(`${url}/register`)
+        .send(accountDefault)
 
       const expectedStatusCode = 409
 
       expect(response).not.toBeNull()
       expect(response.statusCode).toBe(expectedStatusCode)
       expect(response.body).toEqual({
-        path: url,
+        path: `${url}/register`,
         code: expectedStatusCode,
         error: HttpStatus.getStatusText(expectedStatusCode),
-        message: new UserAlreadyExistsError(userDefault.email).message,
+        message: new AccountAlreadyExistsError(accountDefault.email).message,
       })
     })
 
     it('should response with server error 500 when an unexpected error occurs', async () => {
-      jest.spyOn(clientPrisma.user, 'findUnique').mockRejectedValueOnce({
+      jest.spyOn(clientPrisma.account, 'findUnique').mockRejectedValueOnce({
         message: 'unexpected behavior',
       })
 
-      const response = await global.testRequest.post(`${url}`).send(userDefault)
+      const response = await global.testRequest
+        .post(`${url}/register`)
+        .send(accountDefault)
 
       const expectedStatusCode = 500
 
       expect(response).not.toBeNull()
       expect(response.statusCode).toBe(expectedStatusCode)
       expect(response.body).toEqual({
-        path: url,
+        path: `${url}/register`,
         code: expectedStatusCode,
         error: HttpStatus.getStatusText(expectedStatusCode),
         message: new ServerError().message,
@@ -79,10 +90,13 @@ describe('User Controller Integration', () => {
     })
   })
 
-  describe('When getting an user', () => {
-    it('should get an user with success', async () => {
-      const createdUser = await userRepository.create(userDefault)
-      const token = AuthServiceImpl.generateToken(createdUser.id as string)
+  describe('When getting an account', () => {
+    it('should get an account with success', async () => {
+      const createdAccount = await accountRepository.create({
+        ...accountDefault,
+        status: AccountStatus.AWAITING_VALIDATION,
+      })
+      const token = AuthServiceImpl.generateToken(createdAccount.id as string)
       const response = await global.testRequest
         .get(`${url}/me`)
         .set({ Authorization: `Bearer ${token}` })
@@ -93,11 +107,11 @@ describe('User Controller Integration', () => {
       expect(response.statusCode).toBe(expectedStatusCode)
       expect(response.body).toMatchObject({
         id: expect.any(String),
-        ...responseUser,
+        ...responseAccount,
       })
     })
 
-    it('should response with client error 401 when user is not authenticated', async () => {
+    it('should response with client error 401 when account is not authenticated', async () => {
       const response = await global.testRequest.get(`${url}/me`)
 
       const expectedStatusCode = 401
@@ -106,8 +120,8 @@ describe('User Controller Integration', () => {
       expect(response.statusCode).toBe(expectedStatusCode)
     })
 
-    it('should response with client error 404 when user does not exists', async () => {
-      const token = AuthServiceImpl.generateToken('invalid-userId')
+    it('should response with client error 404 when account does not exists', async () => {
+      const token = AuthServiceImpl.generateToken('invalid-accountId')
       const response = await global.testRequest
         .get(`${url}/me`)
         .set({ Authorization: `Bearer ${token}` })
@@ -120,14 +134,17 @@ describe('User Controller Integration', () => {
         path: `${url}/me`,
         code: expectedStatusCode,
         error: HttpStatus.getStatusText(expectedStatusCode),
-        message: new UserNotFoundError('invalid-userId').message,
+        message: new AccountNotFoundError('invalid-accountId').message,
       })
     })
 
     it('should response with server error 500 when an unexpected error occurs', async () => {
-      const createdUser = await userRepository.create(userDefault)
-      const token = AuthServiceImpl.generateToken(createdUser.id as string)
-      jest.spyOn(clientPrisma.user, 'findUnique').mockRejectedValueOnce({
+      const createdAccount = await accountRepository.create({
+        ...accountDefault,
+        status: AccountStatus.AWAITING_VALIDATION,
+      })
+      const token = AuthServiceImpl.generateToken(createdAccount.id as string)
+      jest.spyOn(clientPrisma.account, 'findUnique').mockRejectedValueOnce({
         message: 'unexpected behavior',
       })
 

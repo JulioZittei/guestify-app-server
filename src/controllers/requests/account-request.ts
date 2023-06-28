@@ -1,8 +1,8 @@
-interface UserRequest {
+interface AccountRequest {
   name: string
   email: string
   phone: string
   password: string
 }
 
-export { UserRequest }
+export { AccountRequest }

@@ -5,6 +5,6 @@ type TokenResponse = {
   token: string
 }
 
-type AuthUserResponse = Either<UnauthorizedError, TokenResponse>
+type AuthAccountResponse = Either<UnauthorizedError, TokenResponse>
 
-export { AuthUserResponse, TokenResponse }
+export { AuthAccountResponse, TokenResponse }

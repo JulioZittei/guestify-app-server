@@ -1,4 +1,4 @@
-import { AuthUserResponse } from '../responses/auth-user-response'
+import { AuthAccountResponse } from '../responses/auth-account-response'
 
 interface AuthService {
   execute({
@@ -7,7 +7,7 @@ interface AuthService {
   }: {
     email: string
     password: string
-  }): Promise<AuthUserResponse>
+  }): Promise<AuthAccountResponse>
 }
 
 export { AuthService }

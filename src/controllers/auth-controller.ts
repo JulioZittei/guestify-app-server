@@ -23,7 +23,7 @@ class AuthController extends AbstractDefaultController {
   @POST('/auth')
   public async auth(req: Request, res: Response): Promise<Response> {
     try {
-      logger.info('Requesting to authenticate user')
+      logger.info('Requesting to authenticate account')
       const { email, password } = req.body as AuthRequest
       const result = await this.authService.execute({ email, password })
 
@@ -32,7 +32,7 @@ class AuthController extends AbstractDefaultController {
         return this.handleError(result.value as HttpError, req, res)
       }
 
-      logger.info('Responding user authenticated')
+      logger.info('Responding account authenticated')
       return res.status(200).send(result.value)
     } catch (error) {
       logger.error(`Internal Error => ${error}`)

@@ -6,7 +6,7 @@ import cors from '@fastify/cors'
 import jwt from '@fastify/jwt'
 import config from 'config'
 import { AuthController } from './controllers/auth-controller'
-import { UserController } from './controllers/user-controller'
+import { AccountController } from './controllers/account-controller'
 
 class SetupServer {
   private server: FastifyInstance
@@ -52,7 +52,7 @@ class SetupServer {
     logger.info('🎮 Setting up controllers')
 
     this.server.register(bootstrap, {
-      controllers: [UserController, AuthController],
+      controllers: [AccountController, AuthController],
     })
   }
 

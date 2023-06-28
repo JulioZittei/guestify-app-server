@@ -1,9 +1,9 @@
 import { AuthService } from './ports/auth-service'
 import bcrypt from 'bcrypt'
-import { AuthUserResponse } from './responses/auth-user-response'
+import { AuthAccountResponse } from './responses/auth-response'
 import { Inject, Service } from 'fastify-decorators'
-import { UserRepository } from '@src/repositories/ports/user-repository'
-import { UserRepositoryPrisma } from '@src/adapters/repositories/user-repository-prisma'
+import { AccountRepository } from '@src/repositories/ports/account-repository'
+import { AccountRepositoryPrisma } from '@src/adapters/repositories/account-repository-prisma'
 import { UnauthorizedError } from './errors/unauthorized-error'
 import { result, error } from '@src/shared/either'
 import jwt from 'jsonwebtoken'
@@ -16,11 +16,11 @@ interface JwtToken {
 
 @Service('AuthService')
 class AuthServiceImpl implements AuthService {
-  @Inject('UserRepositoryPrisma')
-  private readonly userRepository: UserRepository
+  @Inject('AccountRepositoryPrisma')
+  private readonly accountRepository: AccountRepository
 
-  constructor(userRepository: UserRepositoryPrisma) {
-    this.userRepository = userRepository
+  constructor(accountRepository: AccountRepositoryPrisma) {
+    this.accountRepository = accountRepository
   }
 
   async execute({
@@ -29,27 +29,27 @@ class AuthServiceImpl implements AuthService {
   }: {
     email: string
     password: string
-  }): Promise<AuthUserResponse> {
-    logger.info(`Authenticating user ${email}`)
-    const user = await this.userRepository.findOne({
+  }): Promise<AuthAccountResponse> {
+    logger.info(`Authenticating account ${email}`)
+    const account = await this.accountRepository.findOne({
       email,
     })
 
-    if (!user) {
-      logger.error(`User ${email} not found`)
+    if (!account) {
+      logger.error(`Account ${email} not found`)
       return error(new UnauthorizedError())
     }
 
-    if (!(await AuthServiceImpl.comparePasswords(password, user.password))) {
-      logger.error(`User password does not match`)
+    if (!(await AuthServiceImpl.comparePasswords(password, account.password))) {
+      logger.error(`Account password does not match`)
       return error(new UnauthorizedError())
     }
 
     const token = {
-      token: AuthServiceImpl.generateToken(user.id as string),
+      token: AuthServiceImpl.generateToken(account.id as string),
     }
 
-    logger.info(`User ${user.email} authenticated successfully`)
+    logger.info(`Account ${account.email} authenticated successfully`)
     return result(token)
   }
 
