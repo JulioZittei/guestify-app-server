@@ -1,10 +1,10 @@
-import { UserRepositoryPrisma } from '@src/adapters/repositories/user-repository'
+import { UserRepositoryPrisma } from '@src/adapters/repositories/user-repository-prisma'
 import { ServerError } from '@src/controllers/errors/server-error'
 import HttpStatus from 'http-status-codes'
 import clientPrisma from '@src/adapters/repositories/client'
 import { UserAlreadyExistsError } from '@src/services/errors/user-already-exists-error'
 import { UserNotFoundError } from '@src/services/errors/user-not-found-error'
-import { AuthService } from '@src/services/auth-service'
+import { AuthServiceImpl } from '@src/services/auth-service-impl'
 
 describe('User Controller Integration', () => {
   const userRepository = new UserRepositoryPrisma()
@@ -82,7 +82,7 @@ describe('User Controller Integration', () => {
   describe('When getting an user', () => {
     it('should get an user with success', async () => {
       const createdUser = await userRepository.create(userDefault)
-      const token = AuthService.generateToken(createdUser.id as string)
+      const token = AuthServiceImpl.generateToken(createdUser.id as string)
       const response = await global.testRequest
         .get(`${url}/me`)
         .set({ Authorization: `Bearer ${token}` })
@@ -107,7 +107,7 @@ describe('User Controller Integration', () => {
     })
 
     it('should response with client error 404 when user does not exists', async () => {
-      const token = AuthService.generateToken('invalid-userId')
+      const token = AuthServiceImpl.generateToken('invalid-userId')
       const response = await global.testRequest
         .get(`${url}/me`)
         .set({ Authorization: `Bearer ${token}` })
@@ -126,7 +126,7 @@ describe('User Controller Integration', () => {
 
     it('should response with server error 500 when an unexpected error occurs', async () => {
       const createdUser = await userRepository.create(userDefault)
-      const token = AuthService.generateToken(createdUser.id as string)
+      const token = AuthServiceImpl.generateToken(createdUser.id as string)
       jest.spyOn(clientPrisma.user, 'findUnique').mockRejectedValueOnce({
         message: 'unexpected behavior',
       })

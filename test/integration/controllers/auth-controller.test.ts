@@ -1,4 +1,4 @@
-import { UserRepositoryPrisma } from '@src/adapters/repositories/user-repository'
+import { UserRepositoryPrisma } from '@src/adapters/repositories/user-repository-prisma'
 import { ServerError } from '@src/controllers/errors/server-error'
 import { UnauthorizedError } from '@src/services/errors/unauthorized-error'
 import HttpStatus from 'http-status-codes'

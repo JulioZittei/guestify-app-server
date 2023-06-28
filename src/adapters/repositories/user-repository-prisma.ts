@@ -1,12 +1,12 @@
 import { User } from '@src/models/user'
 import { FilterOptions } from '@src/repositories/ports/default-repository'
-import { IUserRepository } from '@src/repositories/ports/user-repository'
+import { UserRepository } from '@src/repositories/ports/user-repository'
 import { Repository } from '@src/shared/decorators/repository.decorator'
 import clientPrisma from './client'
 import logger from '@src/logger'
 
 @Repository('UserRepositoryPrisma')
-class UserRepositoryPrisma implements IUserRepository {
+class UserRepositoryPrisma implements UserRepository {
   constructor(private database = clientPrisma) {}
 
   public async create(user: User): Promise<User> {

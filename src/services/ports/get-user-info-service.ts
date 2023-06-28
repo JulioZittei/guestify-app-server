@@ -1,7 +1,7 @@
 import { GetUserInfoResponse } from '../responses/get-user-info-response'
 
-interface IGetUserInfoService {
+interface GetUserInfoService {
   execute(userId: string): Promise<GetUserInfoResponse>
 }
 
-export { IGetUserInfoService }
+export { GetUserInfoService }

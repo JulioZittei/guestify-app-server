@@ -1,18 +1,18 @@
 import { Inject, Service } from 'fastify-decorators'
-import { IRegisterUserService } from './ports/register-user-service'
+import { RegisterUserService } from './ports/register-user-service'
 import { RegisterUserResponse } from './responses/register-user-response'
 import { User } from '@src/models/user'
-import { UserRepositoryPrisma } from '@src/adapters/repositories/user-repository'
-import { IUserRepository } from '@src/repositories/ports/user-repository'
+import { UserRepositoryPrisma } from '@src/adapters/repositories/user-repository-prisma'
+import { UserRepository } from '@src/repositories/ports/user-repository'
 import { error, result } from '@src/shared/either'
 import logger from '@src/logger'
-import { AuthService } from './auth-service'
+import { AuthServiceImpl } from './auth-service-impl'
 import { UserAlreadyExistsError } from './errors/user-already-exists-error'
 
 @Service('RegisterUserService')
-class RegisterUserService implements IRegisterUserService {
+class RegisterUserServiceImpl implements RegisterUserService {
   @Inject('UserRepositoryPrisma')
-  private readonly userRepository: IUserRepository
+  private readonly userRepository: UserRepository
 
   constructor(userRepository: UserRepositoryPrisma) {
     this.userRepository = userRepository
@@ -28,7 +28,7 @@ class RegisterUserService implements IRegisterUserService {
     }
 
     logger.info(`Registering user ${user.email}`)
-    const hashedPassword = await AuthService.hashPassword(user.password)
+    const hashedPassword = await AuthServiceImpl.hashPassword(user.password)
     const userCreated: User = await this.userRepository.create(
       User.create({
         ...user,
@@ -40,4 +40,4 @@ class RegisterUserService implements IRegisterUserService {
   }
 }
 
-export { RegisterUserService }
+export { RegisterUserServiceImpl }

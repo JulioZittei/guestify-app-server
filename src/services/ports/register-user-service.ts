@@ -1,8 +1,8 @@
 import { User } from '@src/models/user'
 import { RegisterUserResponse } from '../responses/register-user-response'
 
-interface IRegisterUserService {
+interface RegisterUserService {
   execute(user: User): Promise<RegisterUserResponse>
 }
 
-export { IRegisterUserService }
+export { RegisterUserService }

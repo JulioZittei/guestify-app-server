@@ -1,9 +1,9 @@
-import { IAuthService } from './ports/auth-service'
+import { AuthService } from './ports/auth-service'
 import bcrypt from 'bcrypt'
 import { AuthUserResponse } from './responses/auth-user-response'
 import { Inject, Service } from 'fastify-decorators'
-import { IUserRepository } from '@src/repositories/ports/user-repository'
-import { UserRepositoryPrisma } from '@src/adapters/repositories/user-repository'
+import { UserRepository } from '@src/repositories/ports/user-repository'
+import { UserRepositoryPrisma } from '@src/adapters/repositories/user-repository-prisma'
 import { UnauthorizedError } from './errors/unauthorized-error'
 import { result, error } from '@src/shared/either'
 import jwt from 'jsonwebtoken'
@@ -15,9 +15,9 @@ interface JwtToken {
 }
 
 @Service('AuthService')
-class AuthService implements IAuthService {
+class AuthServiceImpl implements AuthService {
   @Inject('UserRepositoryPrisma')
-  private readonly userRepository: IUserRepository
+  private readonly userRepository: UserRepository
 
   constructor(userRepository: UserRepositoryPrisma) {
     this.userRepository = userRepository
@@ -40,13 +40,13 @@ class AuthService implements IAuthService {
       return error(new UnauthorizedError())
     }
 
-    if (!(await AuthService.comparePasswords(password, user.password))) {
+    if (!(await AuthServiceImpl.comparePasswords(password, user.password))) {
       logger.error(`User password does not match`)
       return error(new UnauthorizedError())
     }
 
     const token = {
-      token: AuthService.generateToken(user.id as string),
+      token: AuthServiceImpl.generateToken(user.id as string),
     }
 
     logger.info(`User ${user.email} authenticated successfully`)
@@ -81,4 +81,4 @@ class AuthService implements IAuthService {
   }
 }
 
-export { AuthService, JwtToken }
+export { AuthServiceImpl, JwtToken }

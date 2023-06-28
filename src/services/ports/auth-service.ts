@@ -1,6 +1,6 @@
 import { AuthUserResponse } from '../responses/auth-user-response'
 
-interface IAuthService {
+interface AuthService {
   execute({
     email,
     password,
@@ -10,4 +10,4 @@ interface IAuthService {
   }): Promise<AuthUserResponse>
 }
 
-export { IAuthService }
+export { AuthService }

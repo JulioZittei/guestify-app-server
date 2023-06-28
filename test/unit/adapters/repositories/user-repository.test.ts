@@ -1,6 +1,6 @@
 import { User } from '@prisma/client'
 import clientPrisma from '@src/adapters/repositories/client'
-import { UserRepositoryPrisma } from '@src/adapters/repositories/user-repository'
+import { UserRepositoryPrisma } from '@src/adapters/repositories/user-repository-prisma'
 
 describe('User Repository Prisma', () => {
   const userDefault = {

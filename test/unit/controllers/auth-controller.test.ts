@@ -1,5 +1,5 @@
-import { UserRepositoryPrisma } from '@src/adapters/repositories/user-repository'
-import { AuthService } from '@src/services/auth-service'
+import { UserRepositoryPrisma } from '@src/adapters/repositories/user-repository-prisma'
+import { AuthServiceImpl } from '@src/services/auth-service-impl'
 import { Request, Response } from '@src/controllers/default-controller'
 import { TokenResponse } from '@src/services/responses/auth-user-response'
 import { error, result } from '@src/shared/either'
@@ -9,8 +9,8 @@ import { UnauthorizedError } from '@src/services/errors/unauthorized-error'
 import HttpStatus from 'http-status-codes'
 import { ServerError } from '@src/controllers/errors/server-error'
 
-jest.mock('@src/services/auth-service')
-jest.mock('@src/adapters/repositories/user-repository')
+jest.mock('@src/services/auth-service-impl')
+jest.mock('@src/adapters/repositories/user-repository-prisma')
 
 describe('Auth Controller', () => {
   const userData = {
@@ -42,9 +42,9 @@ describe('Auth Controller', () => {
   const mockedUserRepository =
     new UserRepositoryPrisma() as jest.Mocked<UserRepositoryPrisma>
 
-  const mockedAuthService = new AuthService(
+  const mockedAuthService = new AuthServiceImpl(
     mockedUserRepository,
-  ) as jest.Mocked<AuthService>
+  ) as jest.Mocked<AuthServiceImpl>
 
   describe('When authenticating an user', () => {
     it('should authenticate an user with success', async () => {

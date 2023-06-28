@@ -1,18 +1,18 @@
-import { UserRepositoryPrisma } from '@src/adapters/repositories/user-repository'
+import { UserRepositoryPrisma } from '@src/adapters/repositories/user-repository-prisma'
 import { Request, Response } from '@src/controllers/default-controller'
 import { ServerError } from '@src/controllers/errors/server-error'
 import { UserController } from '@src/controllers/user-controller'
 import { UserAlreadyExistsError } from '@src/services/errors/user-already-exists-error'
 import { UserNotFoundError } from '@src/services/errors/user-not-found-error'
-import { GetUserInfoService } from '@src/services/get-user-info-service'
-import { RegisterUserService } from '@src/services/register-user-service'
+import { GetUserInfoServiceImpl } from '@src/services/get-user-info-service-impl'
+import { RegisterUserServiceImpl } from '@src/services/register-user-service-impl'
 import { error, result } from '@src/shared/either'
 import { IncomingMessage } from 'http'
 import HttpStatus from 'http-status-codes'
 
-jest.mock('@src/services/register-user-service')
-jest.mock('@src/services/get-user-info-service')
-jest.mock('@src/adapters/repositories/user-repository')
+jest.mock('@src/services/register-user-service-impl')
+jest.mock('@src/services/get-user-info-service-impl')
+jest.mock('@src/adapters/repositories/user-repository-prisma')
 
 describe('User Controller', () => {
   const userDefault = {
@@ -51,13 +51,13 @@ describe('User Controller', () => {
   const mockedUserRepository =
     new UserRepositoryPrisma() as jest.Mocked<UserRepositoryPrisma>
 
-  const mockedRegisterUserService = new RegisterUserService(
+  const mockedRegisterUserService = new RegisterUserServiceImpl(
     mockedUserRepository,
-  ) as jest.Mocked<RegisterUserService>
+  ) as jest.Mocked<RegisterUserServiceImpl>
 
-  const mockedGetUserInfoService = new GetUserInfoService(
+  const mockedGetUserInfoService = new GetUserInfoServiceImpl(
     mockedUserRepository,
-  ) as jest.Mocked<GetUserInfoService>
+  ) as jest.Mocked<GetUserInfoServiceImpl>
 
   describe('When registering an user', () => {
     it('should response an user registered with success', async () => {

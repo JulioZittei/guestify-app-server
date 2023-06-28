@@ -5,17 +5,17 @@ import {
   Request,
   Response,
 } from './default-controller'
-import { IAuthService } from '@src/services/ports/auth-service'
-import { AuthService } from '@src/services/auth-service'
+import { AuthService } from '@src/services/ports/auth-service'
+import { AuthServiceImpl } from '@src/services/auth-service-impl'
 import { AuthRequest } from './requests/auth-request'
 import logger from '@src/logger'
 
 @Controller('/api/v1')
 class AuthController extends AbstractDefaultController {
   @Inject('AuthService')
-  private readonly authService: IAuthService
+  private readonly authService: AuthService
 
-  constructor(authService: AuthService) {
+  constructor(authService: AuthServiceImpl) {
     super()
     this.authService = authService
   }

@@ -1,6 +1,6 @@
 import logger from '@src/logger'
-import { IRegisterUserService } from '@src/services/ports/register-user-service'
-import { RegisterUserService } from '@src/services/register-user-service'
+import { RegisterUserService } from '@src/services/ports/register-user-service'
+import { RegisterUserServiceImpl } from '@src/services/register-user-service-impl'
 import { Controller, GET, Inject, POST } from 'fastify-decorators'
 import { UserRequest } from './requests/user-request'
 import {
@@ -9,21 +9,21 @@ import {
   Request,
   Response,
 } from './default-controller'
-import { IGetUserInfoService } from '@src/services/ports/get-user-info-service'
-import { GetUserInfoService } from '@src/services/get-user-info-service'
+import { GetUserInfoService } from '@src/services/ports/get-user-info-service'
+import { GetUserInfoServiceImpl } from '@src/services/get-user-info-service-impl'
 import { authMiddleware } from '@src/middleware/auth'
 
 @Controller('/api/v1/users')
 class UserController extends AbstractDefaultController {
   @Inject('RegisterUserService')
-  private readonly registerUserService: IRegisterUserService
+  private readonly registerUserService: RegisterUserService
 
   @Inject('GetUserInfoService')
-  private readonly getUserInfoService: IGetUserInfoService
+  private readonly getUserInfoService: GetUserInfoService
 
   constructor(
-    registerUserService: RegisterUserService,
-    getUserInfoService: GetUserInfoService,
+    registerUserService: RegisterUserServiceImpl,
+    getUserInfoService: GetUserInfoServiceImpl,
   ) {
     super()
     this.registerUserService = registerUserService

@@ -1,15 +1,15 @@
 import { Inject, Service } from 'fastify-decorators'
-import { IGetUserInfoService } from './ports/get-user-info-service'
+import { GetUserInfoService } from './ports/get-user-info-service'
 import { GetUserInfoResponse } from './responses/get-user-info-response'
-import { IUserRepository } from '@src/repositories/ports/user-repository'
-import { UserRepositoryPrisma } from '@src/adapters/repositories/user-repository'
+import { UserRepository } from '@src/repositories/ports/user-repository'
+import { UserRepositoryPrisma } from '@src/adapters/repositories/user-repository-prisma'
 import { error, result } from '@src/shared/either'
 import { UserNotFoundError } from './errors/user-not-found-error'
 
 @Service('GetUserInfoService')
-class GetUserInfoService implements IGetUserInfoService {
+class GetUserInfoServiceImpl implements GetUserInfoService {
   @Inject('UserRepositoryPrisma')
-  private readonly userRepository: IUserRepository
+  private readonly userRepository: UserRepository
 
   constructor(userRepository: UserRepositoryPrisma) {
     this.userRepository = userRepository
@@ -26,4 +26,4 @@ class GetUserInfoService implements IGetUserInfoService {
   }
 }
 
-export { GetUserInfoService }
+export { GetUserInfoServiceImpl }

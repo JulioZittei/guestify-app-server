@@ -1,6 +1,6 @@
 import { DefaultRepository } from './default-repository'
 import { User } from '@src/models/user'
 
-type IUserRepository = DefaultRepository<User>
+type UserRepository = DefaultRepository<User>
 
-export { IUserRepository }
+export { UserRepository }

@@ -1,9 +1,9 @@
-import { UserRepositoryPrisma } from '@src/adapters/repositories/user-repository'
-import { AuthService } from '@src/services/auth-service'
+import { UserRepositoryPrisma } from '@src/adapters/repositories/user-repository-prisma'
+import { AuthServiceImpl } from '@src/services/auth-service-impl'
 import { UnauthorizedError } from '@src/services/errors/unauthorized-error'
 import { TokenResponse } from '@src/services/responses/auth-user-response'
 
-jest.mock('@src/adapters/repositories/user-repository')
+jest.mock('@src/adapters/repositories/user-repository-prisma')
 
 describe('Auth Service', () => {
   const userData = {
@@ -27,10 +27,10 @@ describe('Auth Service', () => {
   it('should authenticate an user with success', async () => {
     mockedUserRepository.findOne.mockResolvedValueOnce(existsUser)
 
-    const inTest = new AuthService(mockedUserRepository)
+    const inTest = new AuthServiceImpl(mockedUserRepository)
     const result = await inTest.execute(userData)
 
-    const jwtTokenDecoded = AuthService.decodeToken(
+    const jwtTokenDecoded = AuthServiceImpl.decodeToken(
       (result.value as TokenResponse).token,
     )
 
@@ -48,7 +48,7 @@ describe('Auth Service', () => {
   it('should throw an UnauthorizedError when user password does not match', async () => {
     mockedUserRepository.findOne.mockResolvedValueOnce(existsUser)
 
-    const inTest = new AuthService(mockedUserRepository)
+    const inTest = new AuthServiceImpl(mockedUserRepository)
     const result = await inTest.execute({
       ...userData,
       password: 'invalid-password',
@@ -61,7 +61,7 @@ describe('Auth Service', () => {
   it('should throw an UnauthorizedError when user does not exists', async () => {
     mockedUserRepository.findOne.mockResolvedValueOnce(undefined)
 
-    const inTest = new AuthService(mockedUserRepository)
+    const inTest = new AuthServiceImpl(mockedUserRepository)
     const result = await inTest.execute(userData)
 
     expect(result.isError()).toBeTruthy()
@@ -69,37 +69,37 @@ describe('Auth Service', () => {
   })
 
   it('should hash a given password with success', async () => {
-    const hashedPassword = await AuthService.hashPassword(userData.password)
+    const hashedPassword = await AuthServiceImpl.hashPassword(userData.password)
 
     expect(hashedPassword.length).toBeGreaterThan(userData.password.length)
   })
 
   it('should compare a given password with success when password match', async () => {
-    const hashedPassword = await AuthService.hashPassword(userData.password)
+    const hashedPassword = await AuthServiceImpl.hashPassword(userData.password)
 
     await expect(
-      AuthService.comparePasswords(userData.password, hashedPassword),
+      AuthServiceImpl.comparePasswords(userData.password, hashedPassword),
     ).resolves.toBeTruthy()
   })
 
   it('should compare a given password with success when password does not match', async () => {
-    const hashedPassword = await AuthService.hashPassword(userData.password)
+    const hashedPassword = await AuthServiceImpl.hashPassword(userData.password)
 
     await expect(
-      AuthService.comparePasswords('invalid-password', hashedPassword),
+      AuthServiceImpl.comparePasswords('invalid-password', hashedPassword),
     ).resolves.toBeFalsy()
   })
 
   it('should generate a token with success', async () => {
-    const token = AuthService.generateToken(userData.email)
+    const token = AuthServiceImpl.generateToken(userData.email)
 
     expect(token).not.toEqual(userData.email)
     expect(token.length).toBeGreaterThan(userData.email.length)
   })
 
   it('should decode a token with success', async () => {
-    const token = AuthService.generateToken(userData.email)
-    const decodeToken = AuthService.decodeToken(token)
+    const token = AuthServiceImpl.generateToken(userData.email)
+    const decodeToken = AuthServiceImpl.decodeToken(token)
 
     expect(decodeToken).not.toBeNull()
     expect(decodeToken).toMatchObject({

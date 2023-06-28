@@ -1,8 +1,8 @@
-import { UserRepositoryPrisma } from '@src/adapters/repositories/user-repository'
+import { UserRepositoryPrisma } from '@src/adapters/repositories/user-repository-prisma'
 import { UserAlreadyExistsError } from '@src/services/errors/user-already-exists-error'
-import { RegisterUserService } from '@src/services/register-user-service'
+import { RegisterUserServiceImpl } from '@src/services/register-user-service-impl'
 
-jest.mock('@src/adapters/repositories/user-repository')
+jest.mock('@src/adapters/repositories/user-repository-prisma')
 
 describe('Register User Service', () => {
   const mockedUserRepository =
@@ -26,7 +26,7 @@ describe('Register User Service', () => {
   it('should register an user with success', async () => {
     mockedUserRepository.create.mockResolvedValueOnce(createdUser)
 
-    const inTest = new RegisterUserService(mockedUserRepository)
+    const inTest = new RegisterUserServiceImpl(mockedUserRepository)
     const result = await inTest.execute(userDefault)
 
     expect(result.isResult()).toBeTruthy()
@@ -36,7 +36,7 @@ describe('Register User Service', () => {
   it('should throw an UserAlreadyExistsError when user already exists', async () => {
     mockedUserRepository.exists.mockResolvedValueOnce(true)
 
-    const inTest = new RegisterUserService(mockedUserRepository)
+    const inTest = new RegisterUserServiceImpl(mockedUserRepository)
     const result = await inTest.execute(userDefault)
 
     expect(result.isError()).toBeTruthy()

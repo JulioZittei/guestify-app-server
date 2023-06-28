@@ -1,8 +1,8 @@
-import { UserRepositoryPrisma } from '@src/adapters/repositories/user-repository'
+import { UserRepositoryPrisma } from '@src/adapters/repositories/user-repository-prisma'
 import { UserNotFoundError } from '@src/services/errors/user-not-found-error'
-import { GetUserInfoService } from '@src/services/get-user-info-service'
+import { GetUserInfoServiceImpl } from '@src/services/get-user-info-service-impl'
 
-jest.mock('@src/adapters/repositories/user-repository')
+jest.mock('@src/adapters/repositories/user-repository-prisma')
 
 describe('Get User Service', () => {
   const userId = 'f10b3c94-e28f-45b8-90a9-577a72c44143'
@@ -23,7 +23,7 @@ describe('Get User Service', () => {
   it('should get an user with success', async () => {
     mockedUserRepository.findOne.mockResolvedValueOnce(existsUser)
 
-    const inTest = new GetUserInfoService(mockedUserRepository)
+    const inTest = new GetUserInfoServiceImpl(mockedUserRepository)
     const result = await inTest.execute(userId)
 
     expect(result.isResult()).toBeTruthy()
@@ -33,7 +33,7 @@ describe('Get User Service', () => {
   it('should throw an UserNotFoundError when user does not exists', async () => {
     mockedUserRepository.findOne.mockResolvedValueOnce(undefined)
 
-    const inTest = new GetUserInfoService(mockedUserRepository)
+    const inTest = new GetUserInfoServiceImpl(mockedUserRepository)
     const result = await inTest.execute(userId)
 
     expect(result.isError()).toBeTruthy()

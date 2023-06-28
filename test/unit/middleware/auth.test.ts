@@ -1,10 +1,10 @@
 import { Request } from '@src/controllers/default-controller'
 import { authMiddleware } from '@src/middleware/auth'
-import { AuthService } from '@src/services/auth-service'
+import { AuthServiceImpl } from '@src/services/auth-service-impl'
 
 describe('Auth Middleware', () => {
   it('should verify a JWT token and call next middleware', async () => {
-    const jwtToken = AuthService.generateToken('fake')
+    const jwtToken = AuthServiceImpl.generateToken('fake')
     const req: Partial<Request> = {
       jwtVerify: jest.fn(),
       headers: {
