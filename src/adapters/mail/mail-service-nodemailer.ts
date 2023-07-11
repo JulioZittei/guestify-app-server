@@ -14,7 +14,7 @@ class MailServiceNodeMailer implements MailService {
       return true
     } catch (error) {
       logger.error(`Email was not sent due an error: ${error}`)
-      return false
+      throw new Error((error as Error).message)
     }
   }
 }
