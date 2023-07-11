@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Flex:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>Confirmação de Conta</title>
+
+    <style>
+      * {
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Roboto Flex', sans-serif;
+        font-size: 62.5%;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+      }
+
+      .header {
+        flex: 1;
+        background-color: #f0f2f7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2.4rem 0.8rem;
+      }
+
+      .header_content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        max-width: 100%;
+      }
+
+      .header_content_logo {
+        background-color: #696969;
+        padding: 1.2rem 3.2rem;
+        border-radius: 2px;
+        font-size: 2.4rem;
+        color: #fff;
+      }
+
+      .main {
+        flex: 1;
+        background-color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2.4rem 0.8rem;
+      }
+
+      .main_content {
+        display: flex;
+        flex-direction: column;
+        max-width: 100%;
+        text-align: center;
+      }
+
+      .main_content_header {
+        font-size: 2rem;
+        color: #000;
+      }
+
+      .main_content_header > span {
+        font-size: 2.8rem;
+      }
+
+      .main_content_text {
+        margin: 0.8rem 0 0 0;
+        font-size: 1.6rem;
+        color: #696969;
+      }
+
+      .main_content_code {
+        margin: 2.4rem 0 0 0;
+        padding: 1.2rem 3.2rem;
+        background-color: #1593ff;
+        border-radius: 4px;
+        align-self: center;
+        font-size: 2rem;
+        font-weight: bold;
+        color: #fff;
+      }
+
+      .footer {
+        background-color: #f0f2f7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2.4rem 0.8rem;
+      }
+
+      .footer_content {
+        display: flex;
+        flex-direction: column;
+        max-width: 100%;
+        text-align: center;
+      }
+
+      .footer_content_sender {
+        margin: 0.8rem 0 0 0;
+        font-size: 1.6rem;
+        font-weight: bold;
+        color: #000;
+      }
+
+      .footer_content_location {
+        margin: 0.8rem 0 0 0;
+        font-size: 1.6rem;
+        color: #000;
+      }
+
+      .footer_content_recipient {
+        margin: 0.8rem 0 0 0;
+        font-size: 1.6rem;
+        color: #000;
+      }
+
+      @media only screen and (max-width: 768px) {
+        .main_content_header {
+          font-size: 1.8rem;
+        }
+
+        .main_content_text {
+          font-size: 1.4rem;
+        }
+
+        .main_content_code {
+          font-size: 1.8rem;
+        }
+
+        .footer_content_sender,
+        .footer_content_location,
+        .footer_content_recipient {
+          font-size: 1.4rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header_content">
+        <div class="header_content_logo">Guestify</div>
+      </div>
+    </header>
+
+    <main class="main">
+      <article class="main_content">
+        <h2 class="main_content_header">
+          <span>🎊</span> Aeeee! Falta pouco, {{name}}. <span>🎊</span>
+        </h2>
+        <p class="main_content_text">
+          Confirme seu cadastro com o código abaixo:
+        </p>
+        <span class="main_content_code">{{code}}</span>
+      </article>
+    </main>
+
+    <footer class="footer">
+      <div class="footer_content">
+        <p class="footer_content_sender">Equipe Guestify</p>
+        <p class="footer_content_location">Carapicuíba/SP - Brasil</p>
+        <p class="footer_content_recipient">
+          Este e-mail foi enviado para {{email}}
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

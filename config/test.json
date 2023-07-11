@@ -11,11 +11,6 @@
     "auth": {
       "secretKey": "some-key",
       "expiresIn": "1m"
-    },
-    "database": {
-      "url": "",
-      "user": "",
-      "password": ""
     }
   }
 }

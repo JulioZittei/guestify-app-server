@@ -1,0 +1,29 @@
+{
+  "App": {
+    "server": {
+      "port": "APP_SERVER_PORT",
+      "baseUrl": "APP_SERVER_BASE_URL",
+      "logger": {
+        "enabled": "APP_LOGGER_ENABLED",
+        "level": "APP_LOGGER_LEVEL"
+      }
+    },
+    "auth": {
+      "secretKey": "APP_AUTH_SECRET",
+      "expiresIn": "APP_AUTH_EXPIRESIN"
+    },
+    "cache": {
+      "ttl": "APP_CACHE_TTL"
+    },
+    "mail": {
+      "host": "APP_MAIL_HOST",
+      "port": "APP_MAIL_PORT",
+      "from": "APP_MAIL_FROM",
+      "secure": "APP_MAIL_SECURE",
+      "auth": {
+        "user": "APP_MAIL_AUTH_USER",
+        "pass": "APP_MAIL_AUTH_PASS"
+      }
+    }
+  }
+}

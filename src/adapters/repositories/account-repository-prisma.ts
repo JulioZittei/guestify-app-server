@@ -9,8 +9,22 @@ import logger from '@src/logger'
 class AccountRepositoryPrisma implements AccountRepository {
   constructor(private database = clientPrisma) {}
 
+  public async update(account: Account): Promise<Account> {
+    logger.info(`Updating account '${account.email}'`)
+
+    return await this.database.account.update({
+      where: {
+        id: account.id,
+      },
+      data: {
+        ...account,
+        updatedAt: new Date(),
+      },
+    })
+  }
+
   public async create(account: Account): Promise<Account> {
-    logger.info(`Saving account ${account.email}`)
+    logger.info(`Saving account '${account.email}'`)
     return await this.database.account.create({
       data: account,
     })

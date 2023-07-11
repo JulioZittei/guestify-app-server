@@ -5,7 +5,7 @@ class AccountNotFoundError extends Error implements DomainError {
   code: number
 
   constructor(parameter: string) {
-    super(`Account ${parameter} not found.`)
+    super(`There is no account with '${parameter}'.`)
     this.name = 'AccountNotFoundError'
     this.code = HttpStatus.NOT_FOUND
   }

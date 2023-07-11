@@ -5,7 +5,7 @@ class AccountAlreadyExistsError extends Error implements DomainError {
   code: number
 
   constructor(parameter: string) {
-    super(`Account ${parameter} already exists.`)
+    super(`Already exists an account with '${parameter}'.`)
     this.name = 'AccountAlreadyExistsError'
     this.code = HttpStatus.CONFLICT
   }

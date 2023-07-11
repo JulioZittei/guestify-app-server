@@ -12,6 +12,12 @@ import {
 import { GetAccountInfoService } from '@src/services/ports/get-account-info-service'
 import { GetAccountInfoServiceImpl } from '@src/services/get-account-info-service-impl'
 import { authMiddleware } from '@src/middleware/auth'
+import { ResendCodeRequest } from './requests/resend-code-request'
+import { ResendCodeService } from '@src/services/ports/resend-code-service'
+import { ResendCodeServiceImpl } from '@src/services/resend-code-service-impl'
+import { ValidateCodeRequest } from './requests/validate-code-request'
+import { ValidateCodeServiceImpl } from '@src/services/validate-code-service-impl'
+import { ValidateCodeService } from '@src/services/ports/validate-code-service'
 
 @Controller('/api/v1/accounts')
 class AccountController extends AbstractDefaultController {
@@ -21,13 +27,23 @@ class AccountController extends AbstractDefaultController {
   @Inject('GetAccountInfoService')
   private readonly getAccountInfoService: GetAccountInfoService
 
+  @Inject('ResendCodeServiceImpl')
+  private readonly resendCodeService: ResendCodeService
+
+  @Inject('ValidateCodeServiceImpl')
+  private readonly validateCodeService: ValidateCodeService
+
   constructor(
     registerAccountService: RegisterAccountServiceImpl,
     getAccountInfoService: GetAccountInfoServiceImpl,
+    resendCodeService: ResendCodeServiceImpl,
+    validateCodeService: ValidateCodeServiceImpl,
   ) {
     super()
     this.registerAccountService = registerAccountService
     this.getAccountInfoService = getAccountInfoService
+    this.resendCodeService = resendCodeService
+    this.validateCodeService = validateCodeService
   }
 
   @POST({ url: '/register' })
@@ -42,12 +58,51 @@ class AccountController extends AbstractDefaultController {
         return this.handleError(result.value as HttpError, req, res)
       }
 
-      logger.info('Responding account registered')
+      logger.info('Responding register account')
       return res.status(202).send({
         status: result.value.status,
-        message: `A verification code was sent to the email '${result.value.email}'. Please validate the code to confirm your registration.`,
-        url: `${req.protocol}://${req.headers.host}${req.raw.url}/confirm`,
+        message: `A verification code was sent to the email '${result.value.email}'. Please, validate the code to confirm your registration.`,
       })
+    } catch (error) {
+      logger.error(`Internal Error => ${error}`)
+      return this.handleError(error as HttpError, req, res)
+    }
+  }
+
+  @POST('/register/resend/code')
+  public async resendCode(req: Request, res: Response): Promise<Response> {
+    try {
+      logger.info('Requesting to resend validation code')
+      const { email } = req.body as ResendCodeRequest
+      const result = await this.resendCodeService.execute({ email })
+
+      if (result.isResult()) {
+        logger.info('Responding to resend validation code')
+        return res.status(204).send()
+      }
+
+      logger.error(`Domain Error => ${result.value}`)
+      return this.handleError(result.value as HttpError, req, res)
+    } catch (error) {
+      logger.error(`Internal Error => ${error}`)
+      return this.handleError(error as HttpError, req, res)
+    }
+  }
+
+  @POST('/register/validate/code')
+  public async validateCode(req: Request, res: Response): Promise<Response> {
+    try {
+      logger.info('Requesting to validate code')
+      const { email, code } = req.body as ValidateCodeRequest
+      const result = await this.validateCodeService.execute({ email, code })
+
+      if (result.isResult()) {
+        logger.info('Responding validation code')
+        return res.status(204).send()
+      }
+
+      logger.error(`Domain Error => ${result.value}`)
+      return this.handleError(result.value as HttpError, req, res)
     } catch (error) {
       logger.error(`Internal Error => ${error}`)
       return this.handleError(error as HttpError, req, res)

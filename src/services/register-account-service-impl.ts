@@ -10,17 +10,27 @@ import logger from '@src/logger'
 import { AuthServiceImpl } from './auth-service-impl'
 import { AccountAlreadyExistsError } from './errors/account-already-exists-error'
 import CacheNode from '@src/adapters/cache/node-cache'
+import { MailService } from './ports/mail-service'
+import { MailServiceNodeMailer } from '@src/adapters/mail/mail-service-nodemailer'
+import config from 'config'
+import { MathUtil } from '@src/utils/math-util'
+import { TemplateEmailResolver } from '@src/utils/template-email-resolver'
 
 @Service('RegisterAccountService')
 class RegisterAccountServiceImpl implements RegisterAccountService {
   @Inject('AccountRepositoryPrisma')
   private readonly accountRepository: AccountRepository
 
+  @Inject('MailServiceNodeMailer')
+  private readonly mailService: MailService
+
   constructor(
     accountRepository: AccountRepositoryPrisma,
-    private cache = CacheNode,
+    mailService: MailServiceNodeMailer,
+    private cacheService = CacheNode,
   ) {
     this.accountRepository = accountRepository
+    this.mailService = mailService
   }
 
   public async execute(
@@ -30,7 +40,7 @@ class RegisterAccountServiceImpl implements RegisterAccountService {
     const exists = await this.accountRepository.exists({ email: account.email })
 
     if (exists) {
-      logger.error(`Account '${account.email}' already exists`)
+      logger.error(`Already exists an account with email '${account.email}'`)
       return error(new AccountAlreadyExistsError(account.email))
     }
 
@@ -44,17 +54,29 @@ class RegisterAccountServiceImpl implements RegisterAccountService {
       }),
     )
 
-    logger.info(`Generating a verification code`)
-    const randomCode =
-      Math.floor(Math.random() * (999_999 - 100_000 + 1)) + 100_000
+    logger.info(`Generating a verification code to '${accountCreated.email}'`)
+    const randomCode = MathUtil.generateRandomCode(6)
 
-    logger.info(`Verification code: '${randomCode}'`)
-    this.cache.set(accountCreated.id as string, randomCode)
+    logger.info(`Setting code in cache to '${accountCreated.email}'`)
+    this.cacheService.set(
+      accountCreated.email as string,
+      randomCode,
+      config.get('App.cache.ttl'),
+    )
 
-    logger.info(`Sending code to the email '${accountCreated.email}'`)
-    // TODO: Email service
+    logger.info(`Sending validation code to email '${accountCreated.email}'`)
+    this.mailService.send({
+      from: config.get('App.mail.from'),
+      to: accountCreated.email,
+      subject: 'Confirmação de Cadastro',
+      html: TemplateEmailResolver.resolve('email_validation_template.html', {
+        name: accountCreated.name,
+        email: account.email,
+        code: randomCode,
+      }),
+    })
 
-    logger.info(`Account '${account.email}' registered successfully`)
+    logger.info(`Account pre-registered with success`)
     return result(accountCreated)
   }
 }

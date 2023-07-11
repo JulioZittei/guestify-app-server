@@ -9,6 +9,7 @@ import { result, error } from '@src/shared/either'
 import jwt from 'jsonwebtoken'
 import config from 'config'
 import logger from '@src/logger'
+import { not } from '@src/utils/util'
 
 interface JwtToken {
   sub: string
@@ -30,26 +31,31 @@ class AuthServiceImpl implements AuthService {
     email: string
     password: string
   }): Promise<AuthAccountResponse> {
-    logger.info(`Authenticating account ${email}`)
-    const account = await this.accountRepository.findOne({
+    logger.info(`Authenticating accountExists '${email}'`)
+    const accountExists = await this.accountRepository.findOne({
       email,
     })
 
-    if (!account) {
-      logger.error(`Account ${email} not found`)
+    if (not(accountExists)) {
+      logger.error(`There is no account with '${email}'`)
       return error(new UnauthorizedError())
     }
 
-    if (!(await AuthServiceImpl.comparePasswords(password, account.password))) {
+    if (
+      !(await AuthServiceImpl.comparePasswords(
+        password,
+        accountExists?.password as string,
+      ))
+    ) {
       logger.error(`Account password does not match`)
       return error(new UnauthorizedError())
     }
 
     const token = {
-      token: AuthServiceImpl.generateToken(account.id as string),
+      token: AuthServiceImpl.generateToken(accountExists?.id as string),
     }
 
-    logger.info(`Account ${account.email} authenticated successfully`)
+    logger.info(`Account '${accountExists?.email}' authenticated successfully`)
     return result(token)
   }
 

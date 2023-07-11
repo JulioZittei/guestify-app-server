@@ -12,10 +12,18 @@
       "secretKey": "some-key",
       "expiresIn": "1m"
     },
-    "database": {
-      "url": "",
-      "user": "",
-      "password": ""
+    "cache": {
+      "ttl": 900
+    },
+    "mail": {
+      "host": "",
+      "port": "",
+      "secure": false,
+      "from": "",
+      "auth": {
+        "user": "",
+        "pass": ""
+      }
     }
   }
 }
