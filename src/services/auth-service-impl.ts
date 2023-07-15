@@ -9,7 +9,9 @@ import { result, error } from '@src/shared/either'
 import jwt from 'jsonwebtoken'
 import config from 'config'
 import logger from '@src/logger'
-import { not } from '@src/utils/util'
+import { equals, not } from '@src/utils/util'
+import { AccountStatus } from '@src/models/account'
+import { EmailConfirmationPendingError } from './errors/email-confirmation-pending-error'
 
 interface JwtToken {
   sub: string
@@ -49,6 +51,11 @@ class AuthServiceImpl implements AuthService {
     ) {
       logger.error(`Account password does not match`)
       return error(new UnauthorizedError())
+    }
+
+    if (equals(accountExists?.status, AccountStatus.AWAITING_VALIDATION)) {
+      logger.error(`Email confirmation pending`)
+      return error(new EmailConfirmationPendingError())
     }
 
     const token = {
