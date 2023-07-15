@@ -8,6 +8,7 @@ import { IncomingMessage } from 'http'
 import { UnauthorizedError } from '@src/services/errors/unauthorized-error'
 import HttpStatus from 'http-status-codes'
 import { ServerError } from '@src/controllers/errors/server-error'
+import { EmailConfirmationPendingError } from '@src/services/errors/email-confirmation-pending-error'
 
 jest.mock('@src/services/auth-service-impl')
 jest.mock('@src/adapters/repositories/account-repository-prisma')
@@ -81,6 +82,28 @@ describe('Auth Controller', () => {
         code: expectedStatusCode,
         error: HttpStatus.getStatusText(expectedStatusCode),
         message: new UnauthorizedError().message,
+      })
+    })
+
+    it('should response with client error 412 when email confirmation is pending', async () => {
+      mockedAuthService.execute.mockResolvedValueOnce(
+        error(new EmailConfirmationPendingError()),
+      )
+
+      const inTest = new AuthController(mockedAuthService)
+      const response: Response = await inTest.auth(
+        req as Request,
+        res as Response,
+      )
+
+      const expectedStatusCode = 412
+
+      expect(response.status).toHaveBeenCalledWith(expectedStatusCode)
+      expect(response.send).toHaveBeenCalledWith({
+        path: raw.url,
+        code: expectedStatusCode,
+        error: HttpStatus.getStatusText(expectedStatusCode),
+        message: new EmailConfirmationPendingError().message,
       })
     })
 

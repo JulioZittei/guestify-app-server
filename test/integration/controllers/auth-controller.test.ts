@@ -4,6 +4,7 @@ import { UnauthorizedError } from '@src/services/errors/unauthorized-error'
 import HttpStatus from 'http-status-codes'
 import clientPrisma from '@src/adapters/repositories/client'
 import { AccountStatus } from '@src/models/account'
+import { EmailConfirmationPendingError } from '@src/services/errors/email-confirmation-pending-error'
 
 describe('Auth Controller Integration', () => {
   const accountRepository = new AccountRepositoryPrisma()
@@ -20,7 +21,7 @@ describe('Auth Controller Integration', () => {
     email: 'john@mail.com',
     phone: '(11) 99999-9999',
     password: '$2b$10$PNRZCsndk3R2aggYXZxMI.9XGOSwxspi1tsdHVFP7VlHb854mxvKS',
-    status: AccountStatus.AWAITING_VALIDATION,
+    status: AccountStatus.EMAIL_VALIDATED,
   }
 
   beforeEach(async () => {
@@ -56,6 +57,28 @@ describe('Auth Controller Integration', () => {
         code: expectedStatusCode,
         error: HttpStatus.getStatusText(expectedStatusCode),
         message: new UnauthorizedError().message,
+      })
+    })
+
+    it('should response with client error 412 when email confirmation is pending', async () => {
+      await accountRepository.create({
+        ...accountDefault,
+        status: AccountStatus.AWAITING_VALIDATION,
+      })
+
+      const response = await global.testRequest
+        .post('/api/v1/auth')
+        .send(accountData)
+
+      const expectedStatusCode = 412
+
+      expect(response).not.toBeNull()
+      expect(response.statusCode).toBe(expectedStatusCode)
+      expect(response.body).toEqual({
+        path: url,
+        code: expectedStatusCode,
+        error: HttpStatus.getStatusText(expectedStatusCode),
+        message: new EmailConfirmationPendingError().message,
       })
     })
 
